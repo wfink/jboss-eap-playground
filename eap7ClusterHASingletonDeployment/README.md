@@ -1,0 +1,101 @@
+Cluster HA Singleton deployed application
+======================================================
+Author: Wolf-Dieter Fink  
+Level: Advanced  
+Technologies: EJB, EAR, Cluster
+Summary: The application shows the configuration and behaviour of an application which should be deployed as a ClusteredSingleton in WildFly/EAP7+
+Target Product: JBoss EAP  
+Source: <https://github.com/wfink/jboss-eap-playground/>  
+
+
+What is it?
+-----------
+
+The `clusterHASingleonDeployment` demonstrates how to configure the deployment descriptor and the resulting server behviour if an application is marked as a cluster singleton.
+
+This example consists of the following Maven projects, each with a shared parent:
+
+| **Sub-project** | **Description** |
+|:-----------|:-----------|
+| `ear` | application deployed as EAR contains jboss-all.xml or singleton-deployment.xml |
+| `ejb` | application jar which is used by EAR, but it is possible to deploy it as is |
+
+The root `pom.xml` builds each of the subprojects in an appropriate order.
+
+
+
+System requirements
+-------------------
+
+The application this project produces is designed to be run on Red Hat JBoss Enterprise Application Platform 7 or later. 
+
+All you need to build this project is Java 8.0 (Java SDK 1.8) or later and Maven 3.1.1 or later. See [Configure Maven for JBoss EAP 7](https://github.com/jboss-developer/jboss-developer-shared-resources/blob/master/guides/CONFIGURE_MAVEN_JBOSS_EAP7.md#configure-maven-to-build-and-deploy-the-quickstarts) to make sure you are configured correctly for testing the quickstarts.
+
+
+Start with a Clean JBoss EAP Install
+--------------------------------------
+
+It is important to start with a clean version of JBoss EAP before testing this quickstart. Be sure to unzip or install a fresh JBoss EAP instance. 
+
+
+Use of EAP7_HOME
+---------------
+
+In the following instructions, replace `EAP7_HOME` with the actual path to your JBoss EAP installation. The installation path is described in detail here: [Use of EAP7_HOME and JBOSS_HOME Variables](https://github.com/jboss-developer/jboss-developer-shared-resources/blob/master/guides/USE_OF_EAP7_HOME.md#use-of-eap_home-and-jboss_home-variables).
+
+
+Configure the JBoss EAP Server
+---------------------------
+
+1. copy the standalone directory as standalone2.
+
+2. Start one instance with
+
+    bin/standalone.sh -Djboss.node.name=Node1 -c standalone-ha.xm
+
+3. Start the second instance with 
+
+    bin/standalone.sh -Djboss.node.name=Node2 -c standalone-ha.xml -Djboss.socket.binding.port-offset=100 -Djboss.server.base.dir=standalone2
+
+
+Build and Deploy the Quickstart
+-------------------------
+
+1. Make sure you have started and configured the JBoss EAP server successfully as described above.
+2. Open a command prompt and navigate to the root directory of this quickstart.
+3. Type this command to build the artifacts:
+
+        mvn clean install
+   
+   You should see `BUILD SUCCESS` at the end of the build `SUCCESS` messages for each component.
+        
+4. In the same command prompt, copy the applications to both folders:
+
+        EAP7_HOME/standalone/deployments
+        EAP7_HOME/standalone2/deployments
+       
+     This will deploy the application files to both servers
+
+
+**Note** the singleton-deployment.xml will be ignored in a subdeployment!
+For the EAR file the singleton-deployment.xml OR the jboss-all.xml can be used to flag the application.
+
+
+Review the logfiles
+---------------------
+You need to check both logfiles to see the application is correct deployed and ONLY enabled for one of the instances
+Here the EAR file is used:
+
+Node1:
+    INFO  [org.jboss.as.server] WFLYSRV0010: Deployed "eap7-ClusterHASingletonDeployment.ear" (runtime-name : "eap7-ClusterHASingletonDeployment.ear")
+    INFO  [org.wildfly.clustering.server] WFLYCLSV0003: Node1 elected as the singleton provider of the jboss.deployment.unit."eap7-ClusterHASingletonDeployment.ear".FIRST_MODULE_USE service
+    INFO  [org.wildfly.wfink.cluster.deployment.SimpleBean] Timer is active @Node1
+
+After shutting down Node1 the logfile of Node2 shows the application is elected here and enabled (note no message will be seen before)
+
+Node2:
+    INFO  [org.wildfly.clustering.server] WFLYCLSV0003: Node2 elected as the singleton provider of the jboss.deployment.unit."eap7-ClusterHASingletonDeployment.ear".FIRST_MODULE_USE service
+    INFO  [org.wildfly.wfink.cluster.deployment.SimpleBean] Timer is active @Node2
+
+
+
