@@ -18,7 +18,8 @@ This example consists of the following Maven projects, each with a shared parent
 | **Sub-project** | **Description** |
 |:-----------|:-----------|
 | `ear` | application deployed as EAR contains jboss-all.xml or singleton-deployment.xml |
-| `ejb` | application jar which is used by EAR, but it is possible to deploy it as is |
+| `ejb` | application jar which is used by EAR, but it is possible to deploy it as is it contains a singleton-deployment.xml which is ignored in EAR |
+| `client` | standalone client to access the SLSB of the application |
 
 The root `pom.xml` builds each of the subprojects in an appropriate order.
 
@@ -98,4 +99,17 @@ Node2:
     INFO  [org.wildfly.wfink.cluster.deployment.SimpleBean] Timer is active @Node2
 
 
+Using the client to invoke the SLSB
+------------------------------------
+The expectation is that the client is able to invoke the EJB as it is clustered and the client should receive the cluster-view and invoke the EJB no matter whether it is deployed on Node1 (which is the node in the initial configuration) or not.
 
+1. Ensure both servers are started and Node1 has activated the application
+2. cd client and start 'mvn exec:java'
+3. the client should able to invoke the SLSB
+4. Stop Node1; it is expected that the app failover to Node2 and the client is able to failover as well
+5. This won't work because of https://issues.jboss.org/browse/WFLY-6882
+   The client will stop working after 10 failed invocations (1sec delay between each failure)
+6. Start Node1; the app should stay on Node2
+   start the client
+   It is expected that the client is able to invoke the app@Node2
+   This won't work as well because of https://issues.jboss.org/browse/WFLY-6882

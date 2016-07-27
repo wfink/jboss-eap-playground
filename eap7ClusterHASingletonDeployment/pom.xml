@@ -143,5 +143,6 @@
     <modules>
         <module>ejb</module>
         <module>ear</module>
+        <module>client</module>
     </modules>
 </project>
