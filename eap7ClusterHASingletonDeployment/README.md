@@ -48,15 +48,15 @@ In the following instructions, replace `EAP7_HOME` with the actual path to your 
 Configure the JBoss EAP Server
 ---------------------------
 
-1. copy the standalone directory as standalone2.
+1. copy the standalone directory as node1 and node2.
 
 2. Start one instance with
 
-    bin/standalone.sh -Djboss.node.name=Node1 -c standalone-ha.xm
+    bin/standalone.sh -Djboss.node.name=node1 -c standalone-ha.xm -Djboss.server.base.dir=node1
 
 3. Start the second instance with 
 
-    bin/standalone.sh -Djboss.node.name=Node2 -c standalone-ha.xml -Djboss.socket.binding.port-offset=100 -Djboss.server.base.dir=standalone2
+    bin/standalone.sh -Djboss.node.name=node2 -c standalone-ha.xml -Djboss.socket.binding.port-offset=100 -Djboss.server.base.dir=node2
 
 
 Build and Deploy the Quickstart
@@ -72,14 +72,16 @@ Build and Deploy the Quickstart
         
 4. In the same command prompt, copy the applications to both folders:
 
-        EAP7_HOME/standalone/deployments
-        EAP7_HOME/standalone2/deployments
+        EAP7_HOME/node1/deployments
+        EAP7_HOME/node2/deployments
        
      This will deploy the application files to both servers
 
 
-**Note** the singleton-deployment.xml will be ignored in a subdeployment!
-For the EAR file the singleton-deployment.xml OR the jboss-all.xml can be used to flag the application.
+**Note**
+- the singleton-deployment.xml will be ignored in a subdeployment!
+- For the EAR file the META-INF/jboss-all.xml has the priority and the META-INF/singleton-deployment.xml will be ignored for the element singleton-deployment!
+- the jboss-all_NotActive.xml is added as template and can be renamed to take effect.
 
 
 Review the logfiles
@@ -87,29 +89,29 @@ Review the logfiles
 You need to check both logfiles to see the application is correct deployed and ONLY enabled for one of the instances
 Here the EAR file is used:
 
-Node1:
+node1:
     INFO  [org.jboss.as.server] WFLYSRV0010: Deployed "eap7-ClusterHASingletonDeployment.ear" (runtime-name : "eap7-ClusterHASingletonDeployment.ear")
-    INFO  [org.wildfly.clustering.server] WFLYCLSV0003: Node1 elected as the singleton provider of the jboss.deployment.unit."eap7-ClusterHASingletonDeployment.ear".FIRST_MODULE_USE service
-    INFO  [org.wildfly.wfink.cluster.deployment.SimpleBean] Timer is active @Node1
+    INFO  [org.wildfly.clustering.server] WFLYCLSV0003: node1 elected as the singleton provider of the jboss.deployment.unit."eap7-ClusterHASingletonDeployment.ear".FIRST_MODULE_USE service
+    INFO  [org.wildfly.wfink.cluster.deployment.SimpleBean] Timer is active @node1
 
-After shutting down Node1 the logfile of Node2 shows the application is elected here and enabled (note no message will be seen before)
+After shutting down node1 the logfile of node2 shows the application is elected here and enabled (note no message will be seen before)
 
-Node2:
-    INFO  [org.wildfly.clustering.server] WFLYCLSV0003: Node2 elected as the singleton provider of the jboss.deployment.unit."eap7-ClusterHASingletonDeployment.ear".FIRST_MODULE_USE service
-    INFO  [org.wildfly.wfink.cluster.deployment.SimpleBean] Timer is active @Node2
+node2:
+    INFO  [org.wildfly.clustering.server] WFLYCLSV0003: node2 elected as the singleton provider of the jboss.deployment.unit."eap7-ClusterHASingletonDeployment.ear".FIRST_MODULE_USE service
+    INFO  [org.wildfly.wfink.cluster.deployment.SimpleBean] Timer is active @node2
 
 
 Using the client to invoke the SLSB
 ------------------------------------
 The expectation is that the client is able to invoke the EJB as it is clustered and the client should receive the cluster-view and invoke the EJB no matter whether it is deployed on Node1 (which is the node in the initial configuration) or not.
 
-1. Ensure both servers are started and Node1 has activated the application
+1. Ensure both servers are started and node1 has activated the application
 2. cd client and start 'mvn exec:java'
 3. the client should able to invoke the SLSB
-4. Stop Node1; it is expected that the app failover to Node2 and the client is able to failover as well
+4. Stop node1; it is expected that the app failover to node2 and the client is able to failover as well
 5. This won't work because of https://issues.jboss.org/browse/WFLY-6882
    The client will stop working after 10 failed invocations (1sec delay between each failure)
-6. Start Node1; the app should stay on Node2
+6. Start node1; the app should stay on node2
    start the client
-   It is expected that the client is able to invoke the app@Node2
+   It is expected that the client is able to invoke the app@node2
    This won't work as well because of https://issues.jboss.org/browse/WFLY-6882
