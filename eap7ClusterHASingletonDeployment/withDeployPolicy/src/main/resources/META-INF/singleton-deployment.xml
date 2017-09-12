@@ -1,0 +1,4 @@
+<!--
+     This file can be used or jboss-all.xml
+-->
+<singleton-deployment policy="reverseNodeName" xmlns="urn:jboss:singleton-deployment:1.0"/>

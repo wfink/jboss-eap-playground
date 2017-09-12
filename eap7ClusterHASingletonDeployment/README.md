@@ -115,3 +115,44 @@ The expectation is that the client is able to invoke the EJB as it is clustered 
    start the client
    It is expected that the client is able to invoke the app@node2
    This won't work as well because of https://issues.jboss.org/browse/WFLY-6882
+
+
+
+
+Adding an application with a different deployment policy
+--------------------------------------------------------
+
+Now we try to add another application but use a different policy to handle the deployment.
+This is to be able to run several HASingleton application on different nodes in the cluster to spread the load and not burden one node with all the HASingleton applications.
+
+1. As the application is already build copy the the application from withDeployPolicy/target/eap7-ClusterHASingletonDeployment-withDeploymentPolicy.jar to all nodes.
+2. See that the deploy fail with 
+
+    WFLYCTL0013: Operation ("deploy") failed - address: ([("deployment" => "eap7-ClusterHASingletonDeployment-withDeploymentPolicy.jar")])
+     - failure description: {"WFLYCTL0180: Services with missing/unavailable dependencies" => ["jboss.deployment.unit.\"eap7-ClusterHASingletonDeployment-withDeploymentPolicy.jar\".CONFIGURE_MODULE is missing [org.wildfly.clustering.singleton.policy.reverseNodeName]"]}
+
+   The root cause is that the application define a policy named "reverseNodeName" within the singleton-deployment.xml
+3. Add the necesarry policy to your configuration
+
+   /subsystem=singleton/singleton-policy=reverseNodeName/election-policy=simple:add(name-preferences=[node4, node3, node2, node1])
+
+   the result is the following XML snippet for the singleton subsystem in your standalone-ha.xml
+
+        <subsystem xmlns="urn:jboss:domain:singleton:1.0">
+            <singleton-policies default="default">
+                ...
+                <singleton-policy name="reverseNodeName" cache-container="server">
+                    <simple-election-policy>
+                        <name-preferences>node4 node3 node2 node1</name-preferences>
+                    </simple-election-policy>
+                </singleton-policy>
+            </singleton-policies>
+        </subsystem>
+
+   As a result the nodes from 4...1 will be elected to activate the application, if only node1 is running the application is deployed here
+   if other nodes are joining the application will move to the node with the best match, so node4 if it is available.
+
+For more information see the folowing documentations:
+
+  https://docs.jboss.org/author/display/WFLY10/HA+Singleton+Features
+  https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.0/html-single/development_guide/#ha_singleton_deployments

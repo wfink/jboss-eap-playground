@@ -144,5 +144,6 @@
         <module>ejb</module>
         <module>ear</module>
         <module>client</module>
+        <module>withDeployPolicy</module>
     </modules>
 </project>
