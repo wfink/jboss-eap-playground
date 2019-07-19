@@ -1,0 +1,16 @@
+# add a correct identifier for transactions
+/subsystem=transactions:write-attribute(name=node-identifier,value=server1)
+
+# don't allow legacy authentication if the servers are on the same machine, this ensure the same behaviour if installed on a different machine
+/core-service=management/security-realm=ApplicationRealm/authentication=local:remove
+
+# add the user and secret for remote-outbound to server2   user=server password=server1
+/core-service=management/security-realm=ejb-security-realm-server2:add()
+/core-service=management/security-realm=ejb-security-realm-server2/server-identity=secret:add(value="c2VydmVyMQ==")
+
+# add a outbound connection for server2
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=server2-ejb:add(host=localhost, port=8180)
+/subsystem=remoting/remote-outbound-connection=server2-ejb-connection:add(outbound-socket-binding-ref=server2-ejb, security-realm=ejb-security-realm-server2, username=server)
+/subsystem=remoting/remote-outbound-connection=server2-ejb-connection/property=SASL_POLICY_NOANONYMOUS:add(value=false)
+/subsystem=remoting/remote-outbound-connection=server2-ejb-connection/property=SSL_ENABLED:add(value=false)
+
