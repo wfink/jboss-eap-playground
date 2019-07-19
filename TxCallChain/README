@@ -1,0 +1,54 @@
+Two applications where an ejb in appOne call an ejb in appTwo
+
+The EJB's are transactional and show that the invoked target will have a transaction.
+
+Note the configuration is made for EAP7 or WildFly
+
+
+use-case:
+=========
+
+1) call via remote interface in a different server using remote-outbound-connection
+   - Install two (optional 3) servers; separate or by copy the standalone directory as shown below
+   - call  mvn exec:java -Dexec.args="user client password client1 [full]"  in the client directory
+
+2) call a loopback, appOne->appTwo->appOne
+   - remote-outbound is already installed in step 1
+   - deploy
+   - call  mvn exec:java -Dexec.args="user client password client1 loopback"  in client directory
+
+3) call a chain of appOne->appTwo->appThree
+   - remote-outbound is already installed in step 1
+   - ensure to start server3 and deploy AppThree
+   - call  mvn exec:java -Dexec.args="user client password client1 three" in client directory
+
+4) call via remote interface in the same server  (need to change stop server[23] and deploy AppTwo for server1)
+   - call  mvn exec:java -Dexec.args="user client password client1" in the client directory
+
+
+
+
+Install the servers
+===================
+- build the project
+   mvn clean install
+- use EAP7 or Wildfly
+- run setup.sh <server dir>
+  this will do the following
+   - copy standalone directory into server1 and server2, optional server3
+   - add application users to the server
+   - copy the application files to the servers
+   - apply the configuration with the server#.cli scripts to each server
+- change to the server directory and start the servers in different shell's
+   ./start1.sh
+   ./start2.sh
+   ./start3.sh
+
+- Due to an issue from 7.1 onwards there is an additional elytron configuration and a patch needed to be able to run the use-case with 3 server chain
+  - run setup2.sh <server dir>
+  - need to apply a patch which fixes https://issues.jboss.org/browse/JBEAP-17163
+
+
+Some build notes:
+=================
+The appOneInterface project is the API for the AppOne, it can't be build inside of appOne (as done in appTwo) because of the cyclic dependecy as appOne need appTwo client API and appTwo need appOne API for the callback.
