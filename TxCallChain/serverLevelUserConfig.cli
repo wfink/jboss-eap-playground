@@ -1,0 +1,6 @@
+embed-server
+
+/subsystem=elytron/authentication-configuration=ejb-auth:add(authentication-name="serverUser", credential-reference={clear-text="redhat1!"})
+/subsystem=elytron/authentication-context=default:add(match-rules=[{authentication-configuration=ejb-auth}])
+/subsystem=elytron:write-attribute(name=default-authentication-context,value=default)
+

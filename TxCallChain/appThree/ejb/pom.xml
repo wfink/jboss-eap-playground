@@ -11,12 +11,12 @@
 
   <parent>
     <groupId>wfink.eap.playground</groupId>
-    <artifactId>TxCallChain-AppTwo</artifactId>
+    <artifactId>TxCallChain-AppThree</artifactId>
     <version>1.0</version>
   </parent>
-  <artifactId>TxCallChain-AppTwo-ejb</artifactId>
+  <artifactId>TxCallChain-AppThree-ejb</artifactId>
   <packaging>ejb</packaging>
-  <name>Application chain - AppTwo - ejb</name>
+  <name>Application chain - AppThree - ejb</name>
 
   <licenses>
     <license>
@@ -47,12 +47,6 @@
       <artifactId>TxCallChain-AppOne-interface</artifactId>
       <version>${project.version}</version>
       <type>jar</type>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>TxCallChain-AppThree-ejb</artifactId>
-      <version>${project.version}</version>
-      <type>ejb-client</type>
     </dependency>
   </dependencies>
 

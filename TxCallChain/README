@@ -9,39 +9,44 @@ use-case:
 =========
 
 1) call via remote interface in a different server using remote-outbound-connection
-   - Install two servers; separate or by copy the standalone directory as shown below
-   - cp appOne/ear/target/TxCallChain-AppOne.ear SERVER_HOME/server1/deployments
-   - cp appTwo/ear/target/TxCallChain-AppTwo.ear SERVER_HOME/server2/deployments
-   - apply server1.cli to the server where you deploy appOne
-   - apply server2.cli to the server where you deploy appTwo
-   - call "mvn exec:java [-Dexec.args='full']" in the client directory
+   - Install two (optional 3) servers; separate or by copy the standalone directory as shown below
+   - call  mvn exec:java -Dexec.args="user client password client1 [full]"  in the client directory
 
 2) call a loopback, appOne->appTwo->appOne
-   - remote-outbound is already installed in step 2
-   - add the jboss-ejb-client.xml to appTwo by rename the file in appTwo/ear/src/main/application/META-INF
+   - remote-outbound is already installed in step 1
    - deploy
-   - call mvn exec:java -Dexec.args="loopback" in client directory
+   - call  mvn exec:java -Dexec.args="user client password client1 loopback"  in client directory
 
-3) call via remote interface in the same server
-   - add the jboss-ejb-client.xml to appOne by rename the appOne/ear/src/main/application/META-INF/add-jboss-ejb-client.xml
-   deploy both applications in the same instance
-   call "mvn exec:java" in the client directory
+3) call a chain of appOne->appTwo->appThree
+   - remote-outbound is already installed in step 1
+   - ensure to start server3 and deploy AppThree
+   - call  mvn exec:java -Dexec.args="user client password client1 three" in client directory
+
+4) call via remote interface in the same server  (need to change stop server[23] and deploy AppTwo for server1)
+   - call  mvn exec:java -Dexec.args="user client password client1" in the client directory
 
 
 
 
 Install the servers
 ===================
+- build the project
+   mvn clean install
 - use EAP7 or Wildfly
-- copy standalone directory into server1 and server2
-- add an application user to the server
-    bin/add-user.sh -sc server1/configuration -a -u client -p client1
-    bin/add-user.sh -sc server2/configuration -a -u client -p client1
-    bin/add-user.sh -sc server2/configuration -a -u server -p server1
-- start server 1
-     bin/standalone.sh -Djboss.server.base.dir=server1 -Djboss.socket.binding.port-offset=0 -Djboss.node.name=server1
-- start server 2
-     bin/standalone.sh -Djboss.server.base.dir=server2 -Djboss.socket.binding.port-offset=100 -Djboss.node.name=server2
+- run setup.sh <server dir>
+  this will do the following
+   - copy standalone directory into server1 and server2, optional server3
+   - add application users to the server
+   - copy the application files to the servers
+   - apply the configuration with the server#.cli scripts to each server
+- change to the server directory and start the servers in different shell's
+   ./start1.sh
+   ./start2.sh
+   ./start3.sh
+
+- Due to an issue from 7.1 onwards there is an additional elytron configuration and a patch needed to be able to run the use-case with 3 server chain
+  - run setup2.sh <server dir>
+  - need to apply a patch which fixes https://issues.jboss.org/browse/JBEAP-17163
 
 
 Some build notes:

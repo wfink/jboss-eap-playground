@@ -43,7 +43,7 @@ public class AppTwoBackloopBean implements AppTwoBackloop {
   @EJB
   LocalAppBean localApp;
 
-  @EJB(lookup = "ejb:TwoAppCallChain-AppOne/ejb//AppOneCallbackBean!org.jboss.wfink.ejb30.appchain.one.AppOneCallback")
+  @EJB(lookup = "ejb:TxCallChain-AppOne/ejb//AppOneCallbackBean!org.wildfly.wfink.ejb.appchain.one.AppOneCallback")
   AppOneCallback appOne;
 
   @Override

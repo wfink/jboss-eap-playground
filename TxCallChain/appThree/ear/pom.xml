@@ -20,17 +20,17 @@
 
     <parent>
         <groupId>wfink.eap.playground</groupId>
-        <artifactId>TxCallChain-AppTwo</artifactId>
+        <artifactId>TxCallChain-AppThree</artifactId>
         <version>1.0</version>
     </parent>
-    <artifactId>TxCallChain-AppTwo-ear</artifactId>
+    <artifactId>TxCallChain-AppThree-ear</artifactId>
     <packaging>ear</packaging>
-    <name>Application chain - AppTwo -ear</name>
+    <name>Application chain - AppThree -ear</name>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>TxCallChain-AppTwo-ejb</artifactId>
+            <artifactId>TxCallChain-AppThree-ejb</artifactId>
             <type>ejb</type>
             <version>${project.version}</version>
         </dependency>
@@ -38,12 +38,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>TxCallChain-AppOne-interface</artifactId>
             <type>jar</type>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>TxCallChain-AppThree-ejb</artifactId>
-            <type>ejb-client</type>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
@@ -63,14 +57,9 @@
                     <modules>
                         <ejbModule>
                             <groupId>${project.groupId}</groupId>
-                            <artifactId>TxCallChain-AppTwo-ejb</artifactId>
+                            <artifactId>TxCallChain-AppThree-ejb</artifactId>
                             <bundleFileName>ejb.jar</bundleFileName>
                         </ejbModule>
-                       <ejbClientModule>
-                            <groupId>${project.groupId}</groupId>
-                            <artifactId>TxCallChain-AppThree-ejb</artifactId>
-                            <bundleDir>lib</bundleDir>
-                        </ejbClientModule>
                         <jarModule>
                             <groupId>${project.groupId}</groupId>
                             <artifactId>TxCallChain-AppOne-interface</artifactId>

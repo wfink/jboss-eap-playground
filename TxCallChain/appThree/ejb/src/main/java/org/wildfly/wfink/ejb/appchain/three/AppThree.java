@@ -14,36 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wildfly.wfink.ejb.appchain.two;
+package org.wildfly.wfink.ejb.appchain.three;
 
 import javax.ejb.Remote;
 
 /**
- * Interface for the demo application One.
+ * Interface for the demo application Three.
  *
  * @author <a href="mailto:wfink@redhat.com">Wolf-Dieter Fink</a>
  */
 @Remote
-public interface AppTwo {
-
-    /**
-     * Method to invoke with a Tx to check that there is one active.
-     *
-     * throws {@link IllegalStateException} if a Tx is not accessible
-     */
-    void checkTxMandatory4Supports();
-
-    /**
-     * Method to invoke without a Tx to check that there is non inside.
-     *
-     * throws {@link IllegalStateException} if a Tx is accessible
-     */
-    void checkTxNotPropagated4Supports();
-
-    /**
-     * Method to call with a Tx, it MUST fail to invoke it
-     */
-    void checkTxNeverWithTx();
-
-		void checkTxMandatory4NextServer();
+public interface AppThree {
+		void txMandatory();
 }

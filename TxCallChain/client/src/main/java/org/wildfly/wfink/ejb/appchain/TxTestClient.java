@@ -109,6 +109,9 @@ public class TxTestClient {
         case "loopback":
           test = 2;
           break;
+        case "three":
+          test = 3;
+          break;
         case "fine":
         case "finer":
         case "finest":
@@ -123,14 +126,18 @@ public class TxTestClient {
     TxTestClient client = new TxTestClient(host, port, user, password, logLevel);
 
     switch (test) {
-      case 0:
-        client.invokeTest();
-        break;
       case 1:
       	client.invokeFullTest();
         break;
       case 2:
       	client.invokeBackloop();
+      	break;
+      case 3:
+      	client.invokeThreeChain();
+      	break;
+      default:
+        client.invokeTest();
+        break;
     }
   }
 
@@ -166,4 +173,16 @@ public class TxTestClient {
     remote.testLoopbackWithoutTx();
     remote.testLoopbackWithTx();
   }
+  
+  /**
+   * Invoke AppTwo which check Tx propagation to AppThree.
+   */
+  private void invokeThreeChain() throws NamingException {
+    final String rcal = "ejb:TxCallChain-AppOne/ejb//AppOneBean!" + AppOne.class.getName();
+    final AppOne remote = (AppOne) context.lookup(rcal);
+    remote.testTxPropagationChainServer3();
+
+    System.out.println("Invoke done");
+  }
+
 }

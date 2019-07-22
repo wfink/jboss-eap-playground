@@ -1,0 +1,12 @@
+# to run without a started server
+embed-server
+
+# add a correct identifier for transactions
+/subsystem=transactions:write-attribute(name=node-identifier,value=server3)
+
+# don't allow legacy authentication if the servers are on the same machine, this ensure the same behaviour if installed on a different machine
+/core-service=management/security-realm=ApplicationRealm/authentication=local:remove
+
+/socket-binding-group=standard-sockets/socket-binding=remoting:add(port=4447)
+/subsystem=remoting/connector=remoting-connector:add(socket-binding=remoting, security-realm=ApplicationRealm)
+/subsystem=remoting/connector=remoting-connector/property=SSL_STARTTLS:add(value=false)

@@ -109,4 +109,11 @@ public class AppOneBean implements AppOne {
   	log.infof("TxLoopbackWithoutTx Tx.NEVER call AppTwo  user=%s  proxy=%s", context.getCallerPrincipal().getName(), appTwoBackloopProxy);
     appTwoBackloopProxy.checkTxNotPropagated4Supports();
   }
+  
+  @Override
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
+  public void testTxPropagationChainServer3() {
+  	log.infof("TxPropagationSupports Tx.REQUIRED call AppTwo->AppThree  user=%s  proxy=%s", context.getCallerPrincipal().getName(), appTwoProxy);
+    appTwoProxy.checkTxMandatory4NextServer();
+  }
 }

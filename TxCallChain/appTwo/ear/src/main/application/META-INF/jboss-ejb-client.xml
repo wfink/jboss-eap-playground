@@ -18,6 +18,7 @@
     <client-context>
         <ejb-receivers>
             <remoting-ejb-receiver outbound-connection-ref="server1-ejb-connection" />
+            <remoting-ejb-receiver outbound-connection-ref="server3-ejb-connection" />
         </ejb-receivers>
     </client-context>
 </jboss-ejb-client>

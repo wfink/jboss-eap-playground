@@ -24,6 +24,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
 import org.jboss.logging.Logger;
+import org.wildfly.wfink.ejb.appchain.three.AppThree;
 
 /**
  * <p>
@@ -41,6 +42,9 @@ public class AppTwoBean implements AppTwo {
 
   @EJB
   LocalAppBean localApp;
+  
+  @EJB(lookup = "ejb:TxCallChain-AppThree/ejb//AppThreeBean!org.wildfly.wfink.ejb.appchain.three.AppThree")
+  AppThree appThree;
 
   @Override
   @TransactionAttribute(TransactionAttributeType.SUPPORTS)
@@ -62,5 +66,13 @@ public class AppTwoBean implements AppTwo {
   @TransactionAttribute(TransactionAttributeType.NEVER)
   public void checkTxNeverWithTx() {
     throw new IllegalStateException("This method should be called with a Tx but fail by container check");
+  }
+  
+  @Override
+  @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+  public void checkTxMandatory4NextServer() {
+    log.infof("check Tx is active for SUPPORTS - must be called in a surrounding Tx  user=%s", context.getCallerPrincipal().getName());
+    appThree.txMandatory();
+    log.info("check OK");
   }
 }

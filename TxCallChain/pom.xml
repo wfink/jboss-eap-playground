@@ -116,6 +116,7 @@
 
     <modules>
         <module>appOneInterface</module>
+        <module>appThree</module>
         <module>appTwo</module>
         <module>appOne</module>
         <module>client</module>

@@ -50,4 +50,6 @@ public interface AppOne {
      *
      */
     void testLoopbackWithoutTx();
+
+		void testTxPropagationChainServer3();
 }

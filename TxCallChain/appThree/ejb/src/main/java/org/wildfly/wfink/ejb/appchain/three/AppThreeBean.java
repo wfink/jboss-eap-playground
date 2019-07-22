@@ -14,36 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wildfly.wfink.ejb.appchain.two;
+package org.wildfly.wfink.ejb.appchain.three;
 
-import javax.ejb.Remote;
+import javax.annotation.Resource;
+import javax.ejb.EJB;
+import javax.ejb.SessionContext;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+
+import org.jboss.logging.Logger;
 
 /**
- * Interface for the demo application One.
+ * <p>
+ * Simple bean with methods to check transaction behaviour and log messages.
+ * </p>
  *
  * @author <a href="mailto:wfink@redhat.com">Wolf-Dieter Fink</a>
  */
-@Remote
-public interface AppTwo {
+@Stateless
+public class AppThreeBean implements AppThree {
+  private static final Logger log = Logger.getLogger(AppThreeBean.class);
 
-    /**
-     * Method to invoke with a Tx to check that there is one active.
-     *
-     * throws {@link IllegalStateException} if a Tx is not accessible
-     */
-    void checkTxMandatory4Supports();
+  @Resource
+  SessionContext context;
 
-    /**
-     * Method to invoke without a Tx to check that there is non inside.
-     *
-     * throws {@link IllegalStateException} if a Tx is accessible
-     */
-    void checkTxNotPropagated4Supports();
-
-    /**
-     * Method to call with a Tx, it MUST fail to invoke it
-     */
-    void checkTxNeverWithTx();
-
-		void checkTxMandatory4NextServer();
+  @Override
+  @TransactionAttribute(TransactionAttributeType.MANDATORY)
+  public void txMandatory() {
+  	log.infof("Tx is active because of MANDATORY - it is called with surrounding Tx  user=%s", context.getCallerPrincipal().getName());
+  }
 }
