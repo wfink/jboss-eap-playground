@@ -1,0 +1,18 @@
+Simple application to show how the Infinispan subsystem can be used to have custom application caches
+
+A simple Web page will allow to add/show/update/delete entries to the cache named "EAPCache"
+
+Note the configuration is made for EAP8
+
+
+Install the servers
+===================
+- build the project
+   mvn clean package
+- use EAP8, install a vanilla zip distribution
+- start the server and configure the additional cache by using bin/jboss-cli.sh
+    /subsystem=infinispan/cache-container=rhdg:add(statistics-enabled=true)
+    /subsystem=infinispan/cache-container=rhdg/local-cache=EAPCache:add(statistics-enabled=true)
+- copy the application war file from target/eap8.cache.war to $EAP/standalone/deployments
+
+- Use your browser to access the application at http://localhost:8080/EAP8Cache
